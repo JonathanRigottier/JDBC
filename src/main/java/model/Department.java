@@ -2,15 +2,15 @@ package model;
 
 public class Department {
 
-    private int departmentIt;
+    private int departmentId;
     private String name;
 
-    public int getDepartmentIt() {
-        return departmentIt;
+    public int getDepartmentId() {
+        return departmentId;
     }
 
-    public void setDepartmentIt(int departmentIt) {
-        this.departmentIt = departmentIt;
+    public void setDepartmentId(int departmentId) {
+        this.departmentId = departmentId;
     }
 
     public String getName() {

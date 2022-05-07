@@ -46,7 +46,25 @@ public class RepositoryEmployee {
         }
     }
 
-    public void updateEmployee(Employee employee) {
+    public void updateEmployee(int employeeID, String firstName, String lastName, String dateOfBirth, String phoneNumber, String email) {
+        String sql = "UPDATE employees SET firstName = ?, lastName = ?, dateOfBirth = ?, phoneNumber = ?, email = ? " +
+                "WHERE employeeId = ?";
+        try {
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1,firstName);
+            preparedStatement.setString(2,lastName);
+            preparedStatement.setString(3,dateOfBirth);
+            preparedStatement.setString(4,phoneNumber);
+            preparedStatement.setString(5,email);
+            preparedStatement.setInt(6,employeeID);
+            int result = preparedStatement.executeUpdate();
+            if(result > 0) {
+                System.out.println("Employee updated with success");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -73,7 +91,7 @@ public class RepositoryEmployee {
             preparedStatement.setInt(1, employeeId);
             int result = preparedStatement.executeUpdate();
             if(result > 0) {
-                System.out.println("Employee delete with success");
+                System.out.println("Employee deleted with success");
             }
 
         } catch (SQLException e) {

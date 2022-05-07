@@ -1,7 +1,11 @@
 package main;
 
+import model.Department;
 import model.Employee;
+import model.Project;
+import persistence.RepositoryDepartment;
 import persistence.RepositoryEmployee;
+import persistence.RepositoryProject;
 
 public class MainTest {
 
@@ -18,7 +22,30 @@ public class MainTest {
 
         //repositoryEmployee.updateEmployeeSalary(1,2000);
 
-        repositoryEmployee.deleteEmployee(7);
+        //repositoryEmployee.deleteEmployee(7);
+
+        //repositoryEmployee.updateEmployee(8,"Jack","Robbins","1989-08-08","+372 558 07 63","jack.robbins@gmail.com");
+
+        RepositoryDepartment repositoryDepartment = new RepositoryDepartment();
+        Department department1 = new Department();
+        department1.setName("Research");
+
+        //repositoryDepartment.saveDepartment(department1);
+
+        //repositoryDepartment.updateDepartment(5,"Marketing");
+
+        //repositoryDepartment.deleteDepartment(5);
+
+        RepositoryProject repositoryProject = new RepositoryProject();
+        Project project1 = new Project();
+        project1.setDescription("SDA Academy Full Course App");
+
+        //repositoryProject.saveProject(project1);
+
+        //repositoryProject.updateProject(4,"Marketing App");
+
+        //repositoryProject.deleteProject(4);
+
 
     }
 
