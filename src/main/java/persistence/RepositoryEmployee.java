@@ -1,13 +1,12 @@
 package persistence;
 
 import model.Employee;
+import model.EmployeeDepartment;
 import util.DBUtil;
 
-import java.sql.Connection;
+import java.sql.*;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 //DDL (data definition language) - create, drop
@@ -16,6 +15,7 @@ import java.util.List;
 public class RepositoryEmployee {
     private Connection connection;  //global attribute
     private PreparedStatement preparedStatement;  //global attribute
+    private ResultSet resultSet;  //global attribute
 
     public RepositoryEmployee (){
         connection = DBUtil.getDBConnection();
@@ -46,17 +46,18 @@ public class RepositoryEmployee {
         }
     }
 
-    public void updateEmployee(int employeeID, String firstName, String lastName, String dateOfBirth, String phoneNumber, String email) {
-        String sql = "UPDATE employees SET firstName = ?, lastName = ?, dateOfBirth = ?, phoneNumber = ?, email = ? " +
+    public void updateEmployee(Employee employee) {
+        String sql = "UPDATE employees SET firstName = ?, lastName = ?, dateOfBirth = ?, phoneNumber = ?, salary = ? ,email = ? " +
                 "WHERE employeeId = ?";
         try {
             preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1,firstName);
-            preparedStatement.setString(2,lastName);
-            preparedStatement.setString(3,dateOfBirth);
-            preparedStatement.setString(4,phoneNumber);
-            preparedStatement.setString(5,email);
-            preparedStatement.setInt(6,employeeID);
+            preparedStatement.setString(1,employee.getFirstName());
+            preparedStatement.setString(2, employee.getLastName());
+            preparedStatement.setDate(3, Date.valueOf(employee.getDateOfBirth()));
+            preparedStatement.setString(4, employee.getPhoneNumber());
+            preparedStatement.setInt(5, employee.getSalary());
+            preparedStatement.setString(6, employee.getEmail());
+            preparedStatement.setInt(7,employee.getEmployeeId());
             int result = preparedStatement.executeUpdate();
             if(result > 0) {
                 System.out.println("Employee updated with success");
@@ -101,11 +102,82 @@ public class RepositoryEmployee {
     }
 
     //DQL (data query language) - select
-    public Employee findEmployeeBy(int employeeId){
-        return null;
+    public Employee findEmployeeById(int employeeId){
+        String sql = "SELECT * FROM employees WHERE employeeId = ? ";
+        Employee employee = null;
+        try {
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1,employeeId);
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                employee = new Employee();
+                employee.setEmployeeId(resultSet.getInt("employeeId"));
+                employee.setFirstName(resultSet.getString("firstName"));
+                employee.setLastName(resultSet.getString("lastName"));
+                employee.setEmail(resultSet.getString("email"));
+                employee.setSalary(resultSet.getInt("salary"));
+                employee.setPhoneNumber(resultSet.getString("phoneNumber"));
+                employee.setDateOfBirth(String.valueOf(resultSet.getDate("dateOfBirth")));
+
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return employee;
     }
 
     public List<Employee> listAllEmployees(){
+        String sql = "SELECT * FROM employees";
+        List<Employee> employeeList = new ArrayList<>();
+        try {
+            preparedStatement = connection.prepareStatement(sql);
+            resultSet = preparedStatement.executeQuery();
+            while(resultSet.next()) {
+                Employee employee = new Employee();
+                String firstName = resultSet.getString("firstName");
+                employee.setFirstName(firstName);
+                employee.setLastName(resultSet.getString("lastName"));
+                employee.setEmail(resultSet.getString("email"));
+                employee.setSalary(resultSet.getInt("salary"));
+                employee.setPhoneNumber(resultSet.getString("phoneNumber"));
+                employee.setDateOfBirth(String.valueOf(resultSet.getDate("dateOfBirth")));
+                employee.setEmployeeId(resultSet.getInt("employeeId"));
+                employeeList.add(employee);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return employeeList;
+    }
+
+    public List<EmployeeDepartment> listEmployeeWithDepartment() {
+        List<EmployeeDepartment> list = new ArrayList<>();
+        String sql = "SELECT e.employeeId AS id, e.firstName, e.lastName, d.name " +
+                     "FROM employees e " +
+                     "INNER JOIN departments d ON e.departmentId = d.departmentId;";
+        try {
+            preparedStatement = connection.prepareStatement(sql);
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()){
+                EmployeeDepartment employeeDept = new EmployeeDepartment();
+                employeeDept.setEmployeeId(resultSet.getInt("id"));
+                employeeDept.setFirstName(resultSet.getString("e.firstName"));
+                employeeDept.setLastName(resultSet.getString("e.lastName"));
+                employeeDept.setDepartmentName(resultSet.getString("d.name"));
+                list.add(employeeDept);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return list;
+    }
+
+    public List<EmployeeDepartment> listEmployeeByDepartmentId(int departmentId){
+        return null;
+    }
+
+    public List<EmployeeDepartment> listEmployeeByDepartmentName(String departmentName){
         return null;
     }
 
